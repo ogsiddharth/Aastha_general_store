@@ -29,22 +29,35 @@ const UPDATE_EVENT_KEY = 'aastha_products_updated';
 // In-memory cache for ultra-fast synchronous reads
 let memoryProductsCache = null;
 
-// Helper to notify local listeners
+// Cross-tab broadcast channel for instantaneous zero-refresh synchronization
+const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
+  ? new BroadcastChannel('aastha_product_sync_channel')
+  : null;
+
+// Helper to notify local listeners and cross-tab channels
 function notifyProductChange(products) {
   memoryProductsCache = products;
   storageService.setItem(PRODUCTS_STORAGE_KEY, products);
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent(UPDATE_EVENT_KEY, { detail: products }));
   }
+  if (syncChannel) {
+    try {
+      syncChannel.postMessage({ type: 'PRODUCTS_UPDATED', products });
+    } catch (err) {
+      console.warn('[productService] BroadcastChannel postMessage error:', err);
+    }
+  }
 }
 
 export const productService = {
   /**
    * Synchronous getter for immediate render from cache or initial seed
+   * @param {boolean} [forceRefresh=false]
    * @returns {Array} List of products
    */
-  getProducts: () => {
-    if (memoryProductsCache && Array.isArray(memoryProductsCache) && memoryProductsCache.length > 0) {
+  getProducts: (forceRefresh = false) => {
+    if (!forceRefresh && memoryProductsCache && Array.isArray(memoryProductsCache) && memoryProductsCache.length > 0) {
       return memoryProductsCache;
     }
     const stored = storageService.getItem(PRODUCTS_STORAGE_KEY, null);
@@ -60,16 +73,18 @@ export const productService = {
   /**
    * Subscribe to real-time product updates.
    * If Firebase is active, connects via Firestore onSnapshot for multi-device live sync.
-   * If Firebase is not configured, uses window storage events.
+   * Also connects to BroadcastChannel and window storage events for instantaneous multi-tab sync.
    * @param {Function} callback - Called with updated products array
    * @returns {Function} Unsubscribe function
    */
   subscribeToProducts: (callback) => {
+    let firestoreUnsubscribe = null;
+
     if (isFirebaseConfigured && db) {
       try {
         const productsCol = collection(db, COLLECTIONS.PRODUCTS);
         // Real-time listener from Firestore
-        const unsubscribe = onSnapshot(
+        firestoreUnsubscribe = onSnapshot(
           productsCol,
           (snapshot) => {
             if (!snapshot.empty) {
@@ -84,11 +99,12 @@ export const productService = {
                 };
               });
 
-              // Sort by createdAt or name
+              // Stable sort by createdAt DESC, then by name ASC
               remoteProducts.sort((a, b) => {
                 const timeA = a.createdAt?.seconds ? a.createdAt.seconds * 1000 : new Date(a.createdAt || 0).getTime();
                 const timeB = b.createdAt?.seconds ? b.createdAt.seconds * 1000 : new Date(b.createdAt || 0).getTime();
-                return timeB - timeA;
+                if (timeB !== timeA) return timeB - timeA;
+                return (a.name || '').localeCompare(b.name || '');
               });
 
               memoryProductsCache = remoteProducts;
@@ -106,31 +122,52 @@ export const productService = {
             callback(productService.getProducts());
           }
         );
-
-        return unsubscribe;
       } catch (err) {
         console.error('[productService] Failed to set up Firestore listener:', err);
       }
     }
 
-    // Local fallback subscription
+    // Local in-window custom event handler
     const handleLocalUpdate = (e) => {
-      const updated = e.detail || productService.getProducts();
+      const updated = e.detail || productService.getProducts(true);
       callback(updated);
     };
 
-    window.addEventListener(UPDATE_EVENT_KEY, handleLocalUpdate);
-    window.addEventListener('storage', (e) => {
+    // Cross-tab storage event listener: invalidate cache and trigger callback
+    const handleStorageUpdate = (e) => {
       if (e.key === PRODUCTS_STORAGE_KEY) {
-        callback(productService.getProducts());
+        memoryProductsCache = null;
+        const fresh = productService.getProducts(true);
+        callback(fresh);
       }
-    });
+    };
 
-    // Initial trigger
+    // Cross-tab BroadcastChannel listener for immediate sync
+    const handleBroadcastMessage = (event) => {
+      if (event.data?.type === 'PRODUCTS_UPDATED' && Array.isArray(event.data.products)) {
+        memoryProductsCache = event.data.products;
+        callback(event.data.products);
+      }
+    };
+
+    window.addEventListener(UPDATE_EVENT_KEY, handleLocalUpdate);
+    window.addEventListener('storage', handleStorageUpdate);
+    if (syncChannel) {
+      syncChannel.addEventListener('message', handleBroadcastMessage);
+    }
+
+    // Initial trigger with current products
     callback(productService.getProducts());
 
     return () => {
+      if (typeof firestoreUnsubscribe === 'function') {
+        firestoreUnsubscribe();
+      }
       window.removeEventListener(UPDATE_EVENT_KEY, handleLocalUpdate);
+      window.removeEventListener('storage', handleStorageUpdate);
+      if (syncChannel) {
+        syncChannel.removeEventListener('message', handleBroadcastMessage);
+      }
     };
   },
 
@@ -203,16 +240,24 @@ export const productService = {
     if (cleanUpdate.inStock !== undefined) cleanUpdate.inStock = Boolean(cleanUpdate.inStock);
     if (cleanUpdate.isBestseller !== undefined) cleanUpdate.isBestseller = Boolean(cleanUpdate.isBestseller);
 
+    // Fetch existing product data to ensure complete upsert if doc doesn't exist yet in Firestore
+    const current = productService.getProductById(id);
+    const mergedDocData = {
+      ...(current || {}),
+      ...cleanUpdate,
+    };
+
     if (isFirebaseConfigured && db) {
       try {
         const docRef = doc(db, COLLECTIONS.PRODUCTS, id);
-        await updateDoc(docRef, cleanUpdate);
+        // Use setDoc with merge: true so both existing and non-pre-seeded items are safely updated
+        await setDoc(docRef, mergedDocData, { merge: true });
       } catch (err) {
-        console.error('[productService] Firestore updateDoc failed:', err);
+        console.error('[productService] Firestore setDoc upsert failed:', err);
       }
     }
 
-    // Update local cache
+    // Update local cache and notify listeners
     const products = productService.getProducts();
     let updatedProduct = null;
     const updatedList = products.map((item) => {

@@ -21,7 +21,7 @@ export function ProductProvider({ children }) {
   }, []);
 
   const refreshProducts = useCallback(() => {
-    const fresh = productService.getProducts();
+    const fresh = productService.getProducts(true);
     setProducts(fresh);
   }, []);
 
