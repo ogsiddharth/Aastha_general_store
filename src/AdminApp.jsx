@@ -65,7 +65,7 @@ export default function AdminApp() {
   });
 
   // Login form state
-  const [username, setUsername] = useState('masterSam');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -86,6 +86,16 @@ export default function AdminApp() {
   // Product Form Modal State
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  // Admin Settings (change username / password)
+  const [credForm, setCredForm] = useState({
+    currentPassword: '',
+    newUsername: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [credError, setCredError] = useState('');
+  const [isSavingCreds, setIsSavingCreds] = useState(false);
 
   // Cloud Seeding State
   const [isSeeding, setIsSeeding] = useState(false);
@@ -183,9 +193,30 @@ export default function AdminApp() {
     showToast('Admin session terminated.', 'info');
   };
 
-  const handleFillDemoCreds = () => {
-    setUsername('masterSam');
-    setPassword('Aastha@Jaunpur2026');
+  const handleSaveCredentials = async (e) => {
+    e.preventDefault();
+    setCredError('');
+    if (credForm.newPassword && credForm.newPassword !== credForm.confirmPassword) {
+      setCredError('New passwords do not match.');
+      return;
+    }
+    setIsSavingCreds(true);
+    try {
+      const res = await authService.changeAdminCredentials({
+        currentPassword: credForm.currentPassword,
+        newUsername: credForm.newUsername,
+        newPassword: credForm.newPassword,
+      });
+      const updatedSession = { ...adminSession, username: res.username };
+      sessionStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(updatedSession));
+      setAdminSession(updatedSession);
+      setCredForm({ currentPassword: '', newUsername: '', newPassword: '', confirmPassword: '' });
+      showToast('Admin credentials updated! Use the new ones next login.', 'success', 5000);
+    } catch (err) {
+      setCredError(err.message || 'Failed to update credentials.');
+    } finally {
+      setIsSavingCreds(false);
+    }
   };
 
   // Handlers for Products
@@ -328,7 +359,7 @@ export default function AdminApp() {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    placeholder="masterSam"
+                    placeholder="Admin ID"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
                   />
                 </div>
@@ -377,27 +408,6 @@ export default function AdminApp() {
               </button>
             </form>
 
-            {/* Quick Demo Helper */}
-            <div className="p-3.5 rounded-2xl bg-slate-800/50 border border-slate-700/60 text-xs text-slate-400 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-slate-300">
-                  Staff Demo Credentials:
-                </span>
-                <button
-                  type="button"
-                  onClick={handleFillDemoCreds}
-                  className="text-[11px] font-bold text-amber-400 hover:underline"
-                >
-                  Auto-fill
-                </button>
-              </div>
-              <p>
-                Username: <code className="font-mono text-amber-300 font-bold">masterSam</code>
-              </p>
-              <p>
-                Password: <code className="font-mono text-amber-300 font-bold">Aastha@Jaunpur2026</code>
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -545,7 +555,7 @@ export default function AdminApp() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-1">
+        <div className="flex items-center gap-2 border-b border-slate-800 pb-1 overflow-x-auto whitespace-nowrap">
           <button
             onClick={() => setActiveTab('inventory')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
@@ -568,6 +578,18 @@ export default function AdminApp() {
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Customer Orders ({orders.length})</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+              activeTab === 'settings'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Lock className="w-4 h-4" />
+            <span>Settings</span>
           </button>
         </div>
 
@@ -954,6 +976,54 @@ export default function AdminApp() {
                 </p>
               </div>
             )}
+          </div>
+        )}
+        {/* TAB 3: ADMIN SETTINGS */}
+        {activeTab === 'settings' && (
+          <div className="max-w-lg space-y-4">
+            <div>
+              <h2 className="text-base font-bold text-white">Admin Login Settings</h2>
+              <p className="text-xs text-slate-400">
+                Current Admin ID: <span className="font-mono text-amber-400">{adminSession?.username}</span>
+              </p>
+            </div>
+
+            {credError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>{credError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSaveCredentials} className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
+              {[
+                { key: 'currentPassword', label: 'Current Password *', type: 'password', required: true },
+                { key: 'newUsername', label: 'New Admin ID (leave empty to keep same)', type: 'text' },
+                { key: 'newPassword', label: 'New Password (min 8 chars, leave empty to keep same)', type: 'password' },
+                { key: 'confirmPassword', label: 'Confirm New Password', type: 'password' },
+              ].map((f) => (
+                <div key={f.key}>
+                  <label className="block text-xs font-bold text-slate-300 mb-1">{f.label}</label>
+                  <input
+                    type={f.type}
+                    required={f.required}
+                    value={credForm[f.key]}
+                    onChange={(e) => setCredForm({ ...credForm, [f.key]: e.target.value })}
+                    autoComplete="off"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 font-mono"
+                  />
+                </div>
+              ))}
+
+              <button
+                type="submit"
+                disabled={isSavingCreds}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm disabled:opacity-50"
+              >
+                {isSavingCreds ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
+                <span>{isSavingCreds ? 'Saving...' : 'Save Admin Credentials'}</span>
+              </button>
+            </form>
           </div>
         )}
       </main>

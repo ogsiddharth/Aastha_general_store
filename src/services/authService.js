@@ -27,6 +27,9 @@ import { generateSalt, hashPasswordWithSalt, sha256 } from '../utils/crypto';
 const SESSION_STORAGE_KEY = 'aastha_session';
 const USERS_STORAGE_KEY = 'aastha_users';
 const AUTH_UPDATE_EVENT = 'aastha_auth_updated';
+const ADMIN_OVERRIDE_KEY = 'aastha_admin_override';
+const ADMIN_SETTINGS_COLLECTION = 'store_settings';
+const ADMIN_SETTINGS_DOC = 'admin';
 
 // Designated Admin Configuration
 export const ADMIN_CONFIG = {
@@ -43,6 +46,20 @@ function resolveEmail(emailOrUser) {
   if (trimmed.includes('@')) return trimmed;
   if (trimmed === ADMIN_CONFIG.username.toLowerCase()) return ADMIN_CONFIG.email;
   return `${trimmed.replace(/[^a-z0-9_]/g, '')}@aasthastore.com`;
+}
+
+// Returns the currently configured admin username (custom one if changed, else default)
+async function getConfiguredAdminUsername() {
+  if (isFirebaseConfigured && db) {
+    try {
+      const snap = await getDoc(doc(db, ADMIN_SETTINGS_COLLECTION, ADMIN_SETTINGS_DOC));
+      if (snap.exists() && snap.data().username) return snap.data().username;
+    } catch (e) {
+      console.warn('[authService] Could not read admin settings:', e);
+    }
+  }
+  const override = storageService.getItem(ADMIN_OVERRIDE_KEY, null);
+  return override?.username || ADMIN_CONFIG.username;
 }
 
 function notifyAuthChange(sessionUser) {
@@ -313,9 +330,11 @@ export const authService = {
    * @param {string} password 
    */
   adminLogin: async (usernameOrEmail, password) => {
+    const configuredUsername = await getConfiguredAdminUsername();
+    const typed = usernameOrEmail.trim();
     const isTargetAdmin =
-      usernameOrEmail.trim() === ADMIN_CONFIG.username ||
-      usernameOrEmail.trim().toLowerCase() === ADMIN_CONFIG.email;
+      typed.toLowerCase() === configuredUsername.toLowerCase() ||
+      typed.toLowerCase() === ADMIN_CONFIG.email;
 
     if (!isTargetAdmin) {
       throw new Error('Unauthorized. This username/email does not possess admin privileges.');
@@ -350,7 +369,7 @@ export const authService = {
           uid: fbUser.uid,
           name: 'Store Administrator',
           email: ADMIN_CONFIG.email,
-          username: ADMIN_CONFIG.username,
+          username: configuredUsername,
           role: 'admin',
           avatar: fbUser.photoURL || '',
         };
@@ -359,7 +378,10 @@ export const authService = {
         return adminSession;
       } catch (fbErr) {
         // If admin account doesn't exist yet in Firebase Auth, attempt to create it automatically!
-        if (fbErr.code === 'auth/user-not-found' || fbErr.code === 'auth/invalid-credential') {
+        if (
+          (fbErr.code === 'auth/user-not-found' || fbErr.code === 'auth/invalid-credential') &&
+          password === ADMIN_CONFIG.defaultPassword
+        ) {
           try {
             // Attempt auto-provisioning initial admin account
             const newCred = await createUserWithEmailAndPassword(auth, ADMIN_CONFIG.email, password);
@@ -381,7 +403,7 @@ export const authService = {
               uid: fbUser.uid,
               name: 'Store Administrator',
               email: ADMIN_CONFIG.email,
-              username: ADMIN_CONFIG.username,
+              username: configuredUsername,
               role: 'admin',
             };
             notifyAuthChange(adminSession);
@@ -396,13 +418,16 @@ export const authService = {
 
     // Local Admin Fallback
     const inputHash = await sha256(password);
-    // Allow default password or hash check
-    if (password === ADMIN_CONFIG.defaultPassword || inputHash === ADMIN_CONFIG.passwordHash || password === 'Aastha@Jaunpur2025') {
+    const override = storageService.getItem(ADMIN_OVERRIDE_KEY, null);
+    const passwordOk = override?.passwordHash
+      ? inputHash === override.passwordHash
+      : password === ADMIN_CONFIG.defaultPassword || inputHash === ADMIN_CONFIG.passwordHash;
+    if (passwordOk) {
       const adminSession = {
         id: 'admin_root_masterSam',
         uid: 'admin_root_masterSam',
         name: 'Store Administrator',
-        username: ADMIN_CONFIG.username,
+        username: configuredUsername,
         email: ADMIN_CONFIG.email,
         phone: ADMIN_CREDENTIALS.storePhone,
         address: 'Main Market, Jaunpur, UP',
@@ -413,6 +438,63 @@ export const authService = {
     }
 
     throw new Error('Invalid Admin password.');
+  },
+
+  /**
+   * Get the current admin username (for showing in Admin Settings)
+   */
+  getAdminUsername: () => getConfiguredAdminUsername(),
+
+  /**
+   * Change admin username and/or password. Current password is always required.
+   * @param {{currentPassword: string, newUsername?: string, newPassword?: string}} params
+   */
+  changeAdminCredentials: async ({ currentPassword, newUsername, newPassword }) => {
+    const cleanUsername = (newUsername || '').trim();
+    if (!currentPassword) throw new Error('Please enter your current admin password.');
+    if (!cleanUsername && !newPassword) throw new Error('Enter a new username or a new password.');
+    if (cleanUsername && !/^[A-Za-z0-9_]{4,20}$/.test(cleanUsername)) {
+      throw new Error('Username must be 4-20 characters (letters, numbers, underscore only).');
+    }
+    if (newPassword && newPassword.length < 8) {
+      throw new Error('New password must be at least 8 characters long.');
+    }
+
+    if (isFirebaseConfigured && auth?.currentUser) {
+      try {
+        const credential = EmailAuthProvider.credential(ADMIN_CONFIG.email, currentPassword);
+        await reauthenticateWithCredential(auth.currentUser, credential);
+        if (newPassword) await updatePassword(auth.currentUser, newPassword);
+      } catch (fbErr) {
+        if (fbErr.code === 'auth/wrong-password' || fbErr.code === 'auth/invalid-credential') {
+          throw new Error('Current password is incorrect.');
+        }
+        throw new Error(fbErr.message || 'Failed to update admin credentials.');
+      }
+      if (cleanUsername && db) {
+        await setDoc(
+          doc(db, ADMIN_SETTINGS_COLLECTION, ADMIN_SETTINGS_DOC),
+          { username: cleanUsername, updatedAt: new Date().toISOString() },
+          { merge: true }
+        );
+      }
+      return { success: true, username: cleanUsername || (await getConfiguredAdminUsername()) };
+    }
+
+    // Local fallback mode
+    const override = storageService.getItem(ADMIN_OVERRIDE_KEY, null);
+    const inputHash = await sha256(currentPassword);
+    const currentOk = override?.passwordHash
+      ? inputHash === override.passwordHash
+      : currentPassword === ADMIN_CONFIG.defaultPassword || inputHash === ADMIN_CONFIG.passwordHash;
+    if (!currentOk) throw new Error('Current password is incorrect.');
+
+    const updated = {
+      username: cleanUsername || override?.username || ADMIN_CONFIG.username,
+      passwordHash: newPassword ? await sha256(newPassword) : override?.passwordHash || '',
+    };
+    storageService.setItem(ADMIN_OVERRIDE_KEY, updated);
+    return { success: true, username: updated.username };
   },
 
   /**

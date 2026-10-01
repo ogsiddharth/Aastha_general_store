@@ -43,14 +43,14 @@ export default function ProductCard({ product }) {
 
   return (
     <div
-      className={`group relative flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 hover:-translate-y-1 overflow-hidden ${
+      className={`group relative flex flex-col rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 hover:-translate-y-1 overflow-hidden ${
         isOutOfStock ? 'opacity-80' : ''
       }`}
     >
       {/* Badges Overlay */}
-      <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between gap-1 pointer-events-none">
+      <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 z-10 flex items-center justify-between gap-1 pointer-events-none">
         {/* Category Badge */}
-        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/70 shadow-sm backdrop-blur-md">
+        <span className="px-1.5 sm:px-2.5 py-0.5 rounded-full text-[8px] sm:text-[10px] font-bold uppercase tracking-wider truncate max-w-[70%] bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700/70 shadow-sm backdrop-blur-md">
           {product.category}
         </span>
 
@@ -64,7 +64,7 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Product Image Container */}
-      <div className="relative w-full pt-[75%] bg-slate-50 dark:bg-slate-800/40 overflow-hidden">
+      <div className="relative w-full pt-[100%] sm:pt-[75%] bg-slate-50 dark:bg-slate-800/40 overflow-hidden">
         {!imageError && product.image ? (
           <img
             src={product.image}
@@ -91,7 +91,7 @@ export default function ProductCard({ product }) {
       </div>
 
       {/* Product Details (Clean Typography, NO PRICES) */}
-      <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-3">
+      <div className="p-2.5 sm:p-5 flex flex-col flex-1 justify-between gap-2 sm:gap-3">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center text-[11px] font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/50 dark:border-emerald-800/40">
@@ -103,25 +103,25 @@ export default function ProductCard({ product }) {
                 In Cart: {currentCartQty}
               </span>
             ) : (
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
+              <span className="hidden sm:inline text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
                 Price at Store
               </span>
             )}
           </div>
 
-          <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+          <h3 className="font-extrabold text-xs sm:text-base text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
             {product.name}
           </h3>
 
-          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+          <p className="hidden sm:block text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
             {product.description || 'Fresh genuine retail stock available at Aastha General Store, Jaunpur.'}
           </p>
         </div>
 
         {/* Action Controls: Compact Quantity Selector & Touch-Friendly Add to Cart */}
-        <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
+        <div className="pt-2 sm:pt-2.5 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
           {!isOutOfStock ? (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 sm:gap-2">
               <QuantitySelector
                 quantity={quantity}
                 onChange={setQuantity}
@@ -133,7 +133,7 @@ export default function ProductCard({ product }) {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className={`flex-1 min-h-[38px] inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-extrabold transition-all duration-200 shadow-sm touch-manipulation ${
+                className={`flex-1 min-h-[34px] sm:min-h-[38px] inline-flex items-center justify-center gap-1 sm:gap-1.5 py-1.5 sm:py-2 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-extrabold transition-all duration-200 shadow-sm touch-manipulation ${
                   isAddedRecently
                     ? 'bg-emerald-700 text-white'
                     : 'bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-md hover:shadow-emerald-600/20 active:scale-95'

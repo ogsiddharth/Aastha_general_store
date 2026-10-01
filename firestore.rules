@@ -53,6 +53,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // 5a. STORE_SETTINGS (stores the custom admin username; no passwords here)
+    match /store_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // 5. ADMIN_USERS COLLECTION
     // Strictly accessible only to authorized administrators
     match /admin_users/{adminId} {
