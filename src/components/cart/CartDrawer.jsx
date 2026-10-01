@@ -52,7 +52,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
-                      Aastha General Store • Jaunpur (222002)
+                      Station Road, Harlalka Rd, Shakar Mandi (222001)
                     </p>
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export default function CartDrawer({ isOpen, onClose }) {
                   <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 flex items-start gap-2">
                     <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-tight">
-                      Items billed at daily store rates upon delivery or pickup at Station Road, Near Line Bazar, Jaunpur.
+                      Items billed at daily store rates upon delivery or pickup at Station Road, Harlalka Rd, Shakar Mandi, Jaunpur - 222001.
                     </p>
                   </div>
 

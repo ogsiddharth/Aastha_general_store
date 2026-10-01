@@ -107,7 +107,7 @@ export default function ShopPage() {
           Aastha Store Catalog
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-          Showing {filteredProducts.length} items of {products.length} total products • Station Road, Near Line Bazar, Jaunpur (222002)
+          Showing {filteredProducts.length} items of {products.length} total products • Station Road, Harlalka Rd, Shakar Mandi, Jaunpur (222001)
         </p>
       </div>
 

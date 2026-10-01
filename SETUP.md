@@ -380,4 +380,4 @@ firebase deploy
 
 ---
 
-*Aastha General Store • Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh • Contact: +91 98073 29612*
+*Aastha General Store • Station Road, Harlalka Rd, Shakar Mandi, Jaunpur, Bagmia, Uttar Pradesh - 222001 • Contact: +91 98073 29612*

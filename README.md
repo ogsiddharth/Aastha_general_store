@@ -7,7 +7,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-10.14-FFCA28?logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![License](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 
-A high-performance, mobile-first frontend web application crafted for **Aastha General Store**, located at Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh, India. Built with clean Glassmorphism UI tokens, instant WhatsApp Checkout, secure authentication, and a Hidden Admin Inventory Management Panel with real-time sync.
+A high-performance, mobile-first frontend web application crafted for **Aastha General Store**, located at Station Road, Harlalka Rd, Shakar Mandi, Jaunpur, Bagmia, Uttar Pradesh - 222001, India. Built with clean Glassmorphism UI tokens, instant WhatsApp Checkout, secure authentication, and a Hidden Admin Inventory Management Panel with real-time sync.
 
 ---
 

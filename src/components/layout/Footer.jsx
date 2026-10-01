@@ -36,7 +36,7 @@ export default function Footer() {
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                 <div>
-                  <span className="block leading-relaxed">Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002</span>
+                  <span className="block leading-relaxed">Station Road, Harlalka Rd, Shakar Mandi, Jaunpur, Bagmia, Uttar Pradesh - 222001</span>
                   <a
                     href={STORE_MAPS_URL}
                     target="_blank"

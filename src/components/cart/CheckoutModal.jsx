@@ -134,7 +134,7 @@ export default function CheckoutModal({ isOpen, onClose }) {
                 Place Your WhatsApp Order
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                Station Road, Near Line Bazar, Jaunpur - 222002
+                Station Road, Harlalka Rd, Shakar Mandi, Jaunpur (222001)
               </p>
             </div>
           </div>

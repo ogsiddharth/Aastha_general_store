@@ -148,7 +148,7 @@ export default function CartPage() {
                   <span>Physical Store Pricing</span>
                 </div>
                 <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Exact item prices are verified at current daily retail rates upon WhatsApp order or physical store pickup at Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002.
+                  Exact item prices are verified at current daily retail rates upon WhatsApp order or physical store pickup at Station Road, Harlalka Rd, Shakar Mandi, Jaunpur, Bagmia, Uttar Pradesh - 222001.
                 </p>
               </div>
 

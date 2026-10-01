@@ -14,6 +14,7 @@ import {
   MapPin,
   ExternalLink,
   Phone,
+  Truck,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
@@ -46,31 +47,36 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Sleek Modern Top Announcement Bar */}
-      <div className="bg-slate-950 text-slate-300 text-[11px] sm:text-xs py-1.5 px-3 sm:px-6 border-b border-slate-800/80">
+      {/* Sleek Modern Promotional Top Announcement Bar */}
+      <div className="bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-950 text-slate-200 text-[11px] sm:text-xs py-2 px-3 sm:px-6 border-b border-emerald-900/40">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
-          {/* Location details */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <span className="inline-flex items-center gap-1 font-bold text-emerald-400 shrink-0">
-              <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-              <span className="hidden sm:inline">Store:</span>
+          {/* Promotional highlights */}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="inline-flex items-center gap-1.5 font-extrabold text-emerald-400 shrink-0">
+              <Truck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="hidden xs:inline">Free Delivery:</span>
             </span>
-            <span className="truncate text-slate-300 font-medium">
-              Station Road, Near Line Bazar, Jaunpur (222002)
+            <span className="truncate text-slate-200 font-medium">
+              Free local doorstep delivery across Jaunpur city on all WhatsApp orders!
+            </span>
+            <span className="hidden lg:inline text-slate-500">•</span>
+            <span className="hidden lg:inline text-slate-300">
+              📍 Station Road, Harlalka Rd, Shakar Mandi (222001)
             </span>
           </div>
 
-          {/* Contact & Google Maps Direct Link */}
+          {/* Store Location Map & Phone */}
           <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
             <a
               href={STORE_MAPS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 font-bold transition-colors underline decoration-emerald-500/40 underline-offset-2"
-              title="Open physical store location in Google Maps"
+              className="inline-flex items-center gap-1 text-[11px] text-emerald-300 hover:text-white font-extrabold transition-colors bg-emerald-900/50 hover:bg-emerald-800/60 px-2.5 py-0.5 rounded-full border border-emerald-700/50 shadow-sm"
+              title="Open physical store in Google Maps"
             >
-              <span>Google Maps</span>
-              <ExternalLink className="w-3 h-3" />
+              <MapPin className="w-3 h-3 text-emerald-300" />
+              <span>Store Map</span>
+              <ExternalLink className="w-2.5 h-2.5 ml-0.5" />
             </a>
 
             <span className="hidden md:inline text-slate-700">|</span>
@@ -98,7 +104,7 @@ export default function Navbar() {
                 Aastha General Store
               </span>
               <span className="block text-[10px] text-slate-500 dark:text-slate-400 -mt-0.5 font-semibold tracking-wide truncate">
-                Station Road, Near Line Bazar, Jaunpur
+                Station Road, Harlalka Rd, Shakar Mandi, Jaunpur
               </span>
             </div>
           </Link>

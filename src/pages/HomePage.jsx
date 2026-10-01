@@ -95,7 +95,7 @@ export default function HomePage() {
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300/50 dark:border-emerald-700/50 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
-            <span className="truncate">Station Road, Near Line Bazar, Jaunpur (222002) • +91 98073 29612</span>
+            <span className="truncate">Station Road, Harlalka Rd, Shakar Mandi (222001) • +91 98073 29612</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15]">
@@ -343,7 +343,7 @@ export default function HomePage() {
               Visit Aastha General Store in Jaunpur
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Visit our physical store near Line Bazar for fresh groceries, personal care, cosmetics, and festival gift hampers.
+              Visit our physical store at Shakar Mandi, Station Road for fresh groceries, personal care, cosmetics, and festival gift hampers.
             </p>
           </div>
 
@@ -372,10 +372,10 @@ export default function HomePage() {
                     Store Address
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium mt-1 leading-relaxed">
-                    Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002
+                    Station Road, Harlalka Rd, Shakar Mandi, Jaunpur, Bagmia, Uttar Pradesh - 222001
                   </p>
                   <span className="inline-block mt-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
-                    PIN: 222002 • Landmark: Near Line Bazar
+                    PIN: 222001 • Landmark: Shakar Mandi / Harlalka Rd
                   </span>
                 </div>
               </div>
@@ -445,8 +445,8 @@ export default function HomePage() {
           {/* Interactive Embedded Google Maps Iframe */}
           <div className="lg:col-span-7 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm relative min-h-[360px] sm:min-h-[420px] bg-slate-100 dark:bg-slate-800">
             <iframe
-              title="Aastha General Store Google Maps Location - Station Road, Near Line Bazar, Jaunpur"
-              src="https://maps.google.com/maps?q=Station+Road,+Near+Line+Bazar,+Jaunpur,+Uttar+Pradesh+222002&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              title="Aastha General Store Google Maps Location - Station Road, Harlalka Rd, Shakar Mandi, Jaunpur, Bagmia"
+              src="https://maps.google.com/maps?q=Station+Road,+Harlalka+Rd,+Shakar+Mandi,+Jaunpur,+Bagmia,+Uttar+Pradesh+222001&t=&z=16&ie=UTF8&iwloc=&output=embed"
               className="w-full h-full min-h-[360px] sm:min-h-[420px] border-0"
               loading="lazy"
               allowFullScreen
@@ -454,7 +454,7 @@ export default function HomePage() {
             />
             <div className="absolute top-3 left-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md border border-slate-200/80 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 pointer-events-none">
               <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Station Road, Near Line Bazar, Jaunpur (222002)</span>
+              <span>Shakar Mandi, Station Road, Jaunpur (222001)</span>
             </div>
           </div>
         </div>
