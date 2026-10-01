@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/manager-portal-sec-x9k2",
+      "destination": "/manager-portal-sec-x9k2.html"
+    },
+    {
+      "source": "/manager-portal-sec-x9k2/(.*)",
+      "destination": "/manager-portal-sec-x9k2.html"
+    },
+    {
+      "source": "/((?!manager-portal-sec-x9k2).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

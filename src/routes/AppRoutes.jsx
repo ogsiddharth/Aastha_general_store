@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
-// Customer Storefront Pages (Admin Panel is isolated in /admin.html)
+// Customer Storefront Pages (Admin Panel is isolated in /manager-portal-sec-x9k2.html)
 const HomePage = lazy(() => import('../pages/HomePage'));
 const ShopPage = lazy(() => import('../pages/ShopPage'));
 const CartPage = lazy(() => import('../pages/CartPage'));

@@ -4,42 +4,46 @@ Comprehensive architectural documentation and step-by-step setup guide for **Aas
 
 ---
 
-## 🏛️ Architecture Overview: Two Completely Separate Entry Points
+## 🏛️ Architecture Overview: Two Completely Isolated Entry Points
 
-To guarantee complete isolation and security, the application uses **Vite Multi-Page Architecture (MPA)** with two completely distinct entry points:
+To guarantee complete isolation, security, and anonymity of store administration, the application is engineered using **Vite Multi-Page Architecture (MPA)** with two completely distinct entry points:
 
 ```
 Aastha_General_Store/
-├── index.html                   --> Customer Storefront (loads /src/main.jsx)
-├── admin.html                   --> Secret Admin Panel (loads /src/admin.jsx)
+├── index.html                           --> Customer Storefront (loads /src/main.jsx)
+├── manager-portal-sec-x9k2.html         --> Obfuscated Secret Admin Terminal (loads /src/admin.jsx)
 ```
 
-1. **Customer Storefront (`/index.html` or `/`)**:
-   - Strictly for general customers in Jaunpur.
-   - **Zero admin links, zero admin buttons, and zero admin dashboard routes anywhere** in the navbar, footer, bottom nav, or account settings.
-   - **No Prices Displayed**: Product cards, cart drawer, cart page, and WhatsApp checkout show items, units, and quantities without prices (as per store policy, retail prices are confirmed at the physical store / upon WhatsApp order).
-2. **Dedicated Secret Admin Panel (`/admin.html` or `/admin`)**:
-   - Completely isolated entry point.
-   - Strictly protected by secret administrator credentials (`masterSam`).
-   - Real-time inventory manager with live product image uploads to **Firebase Storage**.
-   - Real-time WhatsApp order manager with multi-device Firestore synchronization and 1-click status updates.
+### 1. Customer Storefront (`/index.html` or `/`)
+- **Target Audience**: General shoppers across Jaunpur, UP.
+- **Zero Admin Traces**: **ZERO links, ZERO buttons, and ZERO admin routes** anywhere in the customer bundle, navbar, footer, bottom navigation, or user settings.
+- **No Prices Displayed**: As per physical store policy, daily retail prices are not listed online. Product cards show only image, name, category, pack size, stock indicator, and interactive quantity selectors (`- / +`).
+- **Instant WhatsApp Checkout**: Saves the order to Cloud Firestore `orders` collection first, then triggers WhatsApp directed to the store owner at **+91 98073 29612** with an itemized breakdown.
+
+### 2. Obfuscated Secret Admin Panel (`/manager-portal-sec-x9k2` or `manager-portal-sec-x9k2.html`)
+- **Hidden Secret Route**: Accessible strictly via `/manager-portal-sec-x9k2` (configurable via `VITE_ADMIN_SECRET_PATH` in `.env`).
+- **No `/admin` Route**: Visiting `/admin`, `/admin.html`, or similar standard paths returns a customer 404 ("Page Not Found") with zero hint that an administrative portal exists.
+- **Dedicated Entry Point**: Bundled into a separate JavaScript chunk (`dist/assets/managerPortal-*.js`) that is never loaded by customer pages.
+- **Secret Credentials**: Protected by authentication credentials (`masterSam` / `Aastha@Jaunpur2026`).
+- **Real-Time Inventory CRUD**: Add, edit, or delete items with live product image uploads to **Firebase Storage**. Changes sync instantaneously across all devices via Firestore Realtime.
+- **Live WhatsApp Orders Dashboard**: Real-time order stream with status updates (`Received` ➔ `Preparing` ➔ `Dispatched` ➔ `Delivered` ➔ `Cancelled`) and 1-click customer WhatsApp notifications.
 
 ---
 
 ## 📋 Table of Contents
 1. [Prerequisites](#1-prerequisites)
-2. [Firebase Project Creation](#2-firebase-project-creation)
+2. [Firebase Project Setup](#2-firebase-project-setup)
 3. [Enable Firebase Authentication](#3-enable-firebase-authentication)
 4. [Set Up Cloud Firestore Database & Collections](#4-set-up-cloud-firestore-database--collections)
 5. [Deploy Firestore Security Rules](#5-deploy-firestore-security-rules)
-6. [Set Up Firebase Storage (Images & Avatars)](#6-set-up-firebase-storage)
+6. [Set Up Firebase Storage (Images & Avatars)](#6-set-up-firebase-storage-images--avatars)
 7. [Deploy Storage Security Rules](#7-deploy-storage-security-rules)
 8. [Configure Environment Variables (`.env`)](#8-configure-environment-variables-env)
 9. [Local Development Server & Testing](#9-local-development-server--testing)
-10. [1-Click Seeding of 55+ Products into Firestore](#10-1-click-seeding-of-55-products-into-firestore)
-11. [Accessing the Secret Admin Panel](#11-accessing-the-secret-admin-panel)
-12. [WhatsApp Order Flow Testing (+91 98073 29612)](#12-whatsapp-order-flow-testing)
-13. [Production Build & Deployment](#13-production-build--deployment)
+10. [Accessing the Secret Admin Portal](#10-accessing-the-secret-admin-portal)
+11. [1-Click Seeding of 55+ Products into Firestore](#11-1-click-seeding-of-55-products-into-firestore)
+12. [WhatsApp Order Flow Testing (+91 98073 29612)](#12-whatsapp-order-flow-testing-91-98073-29612)
+13. [Production Deployment (Vercel, Netlify, Firebase Hosting)](#13-production-deployment-vercel-netlify-firebase-hosting)
 
 ---
 
@@ -50,18 +54,18 @@ Aastha_General_Store/
 
 ---
 
-## 2. Firebase Project Creation
+## 2. Firebase Project Setup
 1. Go to the **[Firebase Console](https://console.firebase.google.com/)**.
 2. Click **"Add project"** and name it `aastha-general-store`.
 3. Disable or enable Google Analytics (optional).
 4. Click **"Create Project"**.
-5. In Project Overview, click the **Web icon (`</>`)** to register the web app (`Aastha Store Web`).
+5. In Project Overview, click the **Web icon (`</>`)** to register a web app (`Aastha Store Web`).
 6. Copy the generated `firebaseConfig` keys (`apiKey`, `authDomain`, `projectId`, `storageBucket`, `messagingSenderId`, `appId`).
 
 ---
 
 ## 3. Enable Firebase Authentication
-1. In the Firebase Console left menu, navigate to **Build > Authentication**.
+1. In the Firebase Console left sidebar, navigate to **Build > Authentication**.
 2. Click **"Get started"**.
 3. Under the **Sign-in method** tab, select **Email/Password**.
 4. Enable **Email/Password** and click **Save**.
@@ -103,100 +107,106 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && (
+        request.auth.token.email == 'admin@aasthastore.com' ||
         exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-        request.auth.token.email in ['admin@aasthastore.com', 'mastersam@aasthastore.com'] ||
-        request.auth.token.role == 'admin'
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
     }
 
-    // Public read for customer storefront. Admin write only.
+    // Products: Public read, Admin write
     match /products/{productId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow write: if isAdmin();
     }
 
-    // Public read for categories. Admin write only.
+    // Categories: Public read, Admin write
     match /categories/{categoryId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow write: if isAdmin();
     }
 
-    // Orders: Anyone can create (WhatsApp checkout), user reads own, admin reads & updates all.
+    // Orders: Anyone can create; Owner and Admin can read/update
     match /orders/{orderId} {
       allow create: if true;
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow update, delete: if isAdmin();
-    }
-
-    // Users: Profile read/write restricted to owner or admin.
-    match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if isOwner(userId) || isAdmin();
+      allow read, update: if isAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
       allow delete: if isAdmin();
     }
 
-    // Admin Users: Strictly accessible only to authorized administrators
+    // Admin Users Directory: Admins only
     match /admin_users/{adminId} {
       allow read, write: if isAdmin();
+    }
+
+    // Customer Profiles: Owner & Admin access
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
     }
   }
 }
 ```
-3. Click **"Publish"**.
+3. Click **Publish**.
 
 ---
 
-## 6. Set Up Firebase Storage
-1. Navigate to **Build > Storage** and click **"Get started"**.
-2. Select Cloud Storage location: `asia-south1 (Mumbai)`.
-3. Click **Done**.
+## 6. Set Up Firebase Storage (Images & Avatars)
+1. In Firebase Console left menu, navigate to **Build > Storage**.
+2. Click **"Get started"**.
+3. Choose the default Cloud Storage bucket (e.g. `aastha-general-store.appspot.com` in `asia-south1`).
+4. Click **Next** and **Done**.
 
 ---
 
 ## 7. Deploy Storage Security Rules
-1. In Firebase Storage, click the **Rules** tab.
+1. In Storage, click the **Rules** tab.
 2. Paste the contents from `storage.rules`:
 
 ```javascript
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    function isImage() {
-      return request.resource.contentType.matches('image/.*')
-        && request.resource.size < 5 * 1024 * 1024; // 5MB limit
-    }
-
-    // Product Images: Public view, authenticated write
+    // Product Images: Public read, authenticated admin write
     match /products/{allPaths=**} {
       allow read: if true;
-      allow write: if isAuthenticated() && isImage();
+      allow write: if isAuthenticated() &&
+        request.resource.size < 5 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
     }
 
-    // Avatars: Public view, owner authenticated write
-    match /avatars/{userId}/{allPaths=**} {
+    // User Avatar uploads: User owns path
+    match /avatars/{userId}/{fileName} {
       allow read: if true;
-      allow write: if isAuthenticated() && request.auth.uid == userId && isImage();
+      allow write: if isAuthenticated() && request.auth.uid == userId &&
+        request.resource.size < 3 * 1024 * 1024 &&
+        request.resource.contentType.matches('image/.*');
     }
   }
 }
 ```
-3. Click **"Publish"**.
+3. Click **Publish**.
 
 ---
 
 ## 8. Configure Environment Variables (`.env`)
-In the project root, open `.env` and fill in your Firebase project values:
+Create a `.env` file in the project root (copied from `.env.example`):
 
-```env
-VITE_FIREBASE_API_KEY=AIzaSyYourActualApiKeyHere
+```bash
+cp .env.example .env
+```
+
+Populate with your Firebase project credentials:
+
+```ini
+# ==========================================
+# Aastha General Store - Local Environment
+# Jaunpur, Uttar Pradesh (+91 98073 29612)
+# ==========================================
+
+VITE_FIREBASE_API_KEY=AIzaSyYourFirebaseApiKeyHere
 VITE_FIREBASE_AUTH_DOMAIN=aastha-general-store.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=aastha-general-store
 VITE_FIREBASE_STORAGE_BUCKET=aastha-general-store.appspot.com
@@ -207,6 +217,10 @@ VITE_STORE_PHONE=919807329612
 VITE_STORE_NAME="Aastha General Store"
 VITE_STORE_LOCATION="Jaunpur, Uttar Pradesh"
 VITE_ADMIN_EMAIL=admin@aasthastore.com
+
+# Obfuscated Secret Route for the Isolated Admin Portal
+# NEVER disclose this route publicly; visitors to /admin will receive a 404
+VITE_ADMIN_SECRET_PATH=manager-portal-sec-x9k2
 ```
 
 > **Offline Simulation Fallback**: If `.env` is left blank, the app will automatically run in local fallback mode using browser storage. It will never throw unhandled crashes or show a blank screen. Once real keys are provided, it connects to live Cloud Firestore and Firebase Storage immediately!
@@ -225,31 +239,35 @@ npm run dev
 
 The terminal will report:
 - **Customer Storefront**: `http://localhost:3000/` (or `/index.html`)
-- **Secret Admin Panel**: `http://localhost:3000/admin` (or `/admin.html`)
+- **Secret Admin Portal**: `http://localhost:3000/manager-portal-sec-x9k2` (or `/manager-portal-sec-x9k2.html`)
+- **Note**: Accessing `http://localhost:3000/admin` returns a **404 Page Not Found**!
 
 ---
 
-## 10. 1-Click Seeding of 55+ Products into Firestore
-1. Open the Secret Admin Panel at `http://localhost:3000/admin`.
-2. Sign in with the default admin credentials (see below).
-3. Click the blue **"Seed Firestore Catalog"** button in the header.
-4. All **55+ handpicked items** (Groceries, Dairy Milk, KitKat, Uncle Chips, Kurkure, Biscuits, Daily Care, Cosmetics, and Gifts) will be batch-written into your Cloud Firestore `products` collection within seconds!
+## 10. Accessing the Secret Admin Portal
 
----
-
-## 11. Accessing the Secret Admin Panel
-- **URL**: `http://localhost:3000/admin` (or `http://localhost:3000/admin.html`)
+- **Secret URL**: `http://localhost:3000/manager-portal-sec-x9k2`
 - **Default Staff Credentials**:
   - **Secret Admin ID**: `masterSam`
   - **Password Key**: `Aastha@Jaunpur2026`
-- **Features in Admin Panel**:
-  - **Inventory CRUD**: Add, edit, or delete items. Live file uploads upload directly to Firebase Storage with percentage progress and preview!
+- **Features in Admin Portal**:
+  - **Inventory CRUD**: Add, edit, or delete items. Live file uploads upload directly to Firebase Storage with progress bar and live image preview!
   - **Optional Pricing**: Price input can be left blank or 0 as prices are confirmed at the physical store.
   - **Incoming Orders Dashboard**: Live feed of orders placed by customers via WhatsApp checkout. Change status (`Received` ➔ `Preparing` ➔ `Dispatched` ➔ `Delivered` ➔ `Cancelled`) and click **"WhatsApp Customer"** to send live updates directly to their mobile number!
 
 ---
 
-## 12. WhatsApp Order Flow Testing
+## 11. 1-Click Seeding of 55+ Products into Firestore
+
+1. Open the Secret Admin Portal at `http://localhost:3000/manager-portal-sec-x9k2`.
+2. Sign in with admin credentials (`masterSam` / `Aastha@Jaunpur2026`).
+3. Click the blue **"Seed Firestore Catalog"** button in the header.
+4. All **55+ handpicked items** (Groceries, Dairy Milk, KitKat, Uncle Chips, Kurkure, Biscuits, Daily Care, Cosmetics, and Gifts) will be batch-written into your Cloud Firestore `products` collection within seconds!
+
+---
+
+## 12. WhatsApp Order Flow Testing (+91 98073 29612)
+
 1. Visit `http://localhost:3000`.
 2. Browse products (Atta, Rice, Dairy Milk, Kurkure, Uncle Chips, Soaps, Kajal, Gift Hampers).
 3. Select quantities using `+ / -` and click **"Add to Cart"**.
@@ -257,39 +275,107 @@ The terminal will report:
 5. Click **"Proceed to WhatsApp Order"**.
 6. Enter name, 10-digit mobile number, and address in Jaunpur.
 7. Click **"Send Order via WhatsApp"**:
-   - The order document is immediately saved to Firestore (`orders` collection) with a unique Order ID (`AST-XXXX-XXXX`).
+   - The order document is immediately saved to Firestore (`orders` collection) with a unique Order ID (`AST-XXXX`).
    - WhatsApp opens smoothly directed to store manager at **+91 98073 29612** with an itemized list of items and quantities (no prices).
-   - The order appears instantaneously in the Secret Admin Panel (`/admin`) in real-time!
+   - The order appears instantaneously in the Secret Admin Portal (`/manager-portal-sec-x9k2`) in real-time!
 
 ---
 
-## 13. Production Build & Deployment
+## 13. Production Deployment (Vercel, Netlify, Firebase Hosting)
 
-### Test Production Build:
+### Test Production Build Locally:
 ```bash
 npm run build
 ```
-Vite generates two isolated HTML entry points in `dist/`:
+Vite generates two completely isolated HTML entry points in `dist/`:
 - `dist/index.html` (Customer Storefront)
-- `dist/admin.html` (Secret Admin Panel)
+- `dist/manager-portal-sec-x9k2.html` (Secret Admin Portal)
 
-### Deploy to Firebase Hosting:
+---
+
+### Option A: Deploy to Vercel
+The repository includes a pre-configured `vercel.json` with multi-page rewrite routing:
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/manager-portal-sec-x9k2",
+      "destination": "/manager-portal-sec-x9k2.html"
+    },
+    {
+      "source": "/manager-portal-sec-x9k2/(.*)",
+      "destination": "/manager-portal-sec-x9k2.html"
+    },
+    {
+      "source": "/((?!manager-portal-sec-x9k2).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+1. Install Vercel CLI: `npm i -g vercel`
+2. Run `vercel` and follow prompts.
+3. In Vercel Project Settings > Environment Variables, add:
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_FIREBASE_AUTH_DOMAIN`
+   - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_FIREBASE_STORAGE_BUCKET`
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   - `VITE_FIREBASE_APP_ID`
+   - `VITE_ADMIN_SECRET_PATH` = `manager-portal-sec-x9k2`
+
+---
+
+### Option B: Deploy to Netlify
+The repository includes pre-configured `netlify.toml` and `public/_redirects`:
+
+```toml
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/manager-portal-sec-x9k2/*"
+  to = "/manager-portal-sec-x9k2.html"
+  status = 200
+
+[[redirects]]
+  from = "/manager-portal-sec-x9k2"
+  to = "/manager-portal-sec-x9k2.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+1. Push your repository to GitHub (`git push -u origin master`).
+2. Log into [Netlify](https://app.netlify.com/) and click **"Add new site" > "Import an existing project"**.
+3. Select your repository `ogsiddharth/Aastha_general_store`.
+4. Netlify will auto-detect `npm run build` and publish directory `dist`.
+5. Under **Site configuration > Environment variables**, add your Firebase keys.
+
+---
+
+### Option C: Deploy to Firebase Hosting
+The repository includes pre-configured `firebase.json`:
+
 ```bash
 # 1. Install Firebase CLI
 npm install -g firebase-tools
 
-# 2. Login
+# 2. Login to your Google account
 firebase login
 
-# 3. Initialize Hosting
-firebase init hosting
-# - Public directory: dist
-# - Single-page app: Yes
-# - Overwrite index.html: No
+# 3. Associate your project
+firebase use --add
 
-# 4. Deploy
+# 4. Deploy build and security rules
 npm run build
-firebase deploy --only hosting
+firebase deploy
 ```
 
 ---

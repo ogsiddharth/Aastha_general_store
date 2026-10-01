@@ -1,0 +1,18 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/manager-portal-sec-x9k2/*"
+  to = "/manager-portal-sec-x9k2.html"
+  status = 200
+
+[[redirects]]
+  from = "/manager-portal-sec-x9k2"
+  to = "/manager-portal-sec-x9k2.html"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

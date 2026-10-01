@@ -1,0 +1,30 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/manager-portal-sec-x9k2",
+        "destination": "/manager-portal-sec-x9k2.html"
+      },
+      {
+        "source": "/manager-portal-sec-x9k2/**",
+        "destination": "/manager-portal-sec-x9k2.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}
