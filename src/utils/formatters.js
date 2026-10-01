@@ -4,9 +4,9 @@
  * Phone: +91 98073 29612
  */
 
-export const STORE_PHONE = '919807329612';
-export const STORE_NAME = 'Aastha General Store';
-export const STORE_LOCATION = 'Jaunpur, Uttar Pradesh';
+export const STORE_PHONE = import.meta.env.VITE_STORE_PHONE || '919807329612';
+export const STORE_NAME = import.meta.env.VITE_STORE_NAME || 'Aastha General Store';
+export const STORE_LOCATION = import.meta.env.VITE_STORE_LOCATION || 'Jaunpur, Uttar Pradesh';
 
 /**
  * Format numeric value to Indian Rupee (₹) - Helper for Admin use

@@ -59,10 +59,10 @@ export const COLLECTIONS = {
 
 // Admin Configuration
 export const ADMIN_CREDENTIALS = {
-  defaultEmail: 'admin@aasthastore.com',
+  defaultEmail: import.meta.env.VITE_ADMIN_EMAIL || 'admin@aasthastore.com',
   defaultUsername: 'masterSam',
-  storePhone: '919807329612',
-  storeLocation: 'Jaunpur, Uttar Pradesh',
+  storePhone: import.meta.env.VITE_STORE_PHONE || '919807329612',
+  storeLocation: import.meta.env.VITE_STORE_LOCATION || 'Jaunpur, Uttar Pradesh',
 };
 
 export { app, auth, db, storage };
