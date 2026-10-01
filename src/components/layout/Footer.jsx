@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, MessageCircle, ShieldCheck, Heart, Clock } from 'lucide-react';
+import { MapPin, Phone, MessageCircle, ShieldCheck, Heart, Clock, ExternalLink } from 'lucide-react';
+import { STORE_MAPS_URL } from '../../utils/formatters';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -34,7 +35,18 @@ export default function Footer() {
             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002</span>
+                <div>
+                  <span className="block leading-relaxed">Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002</span>
+                  <a
+                    href={STORE_MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-bold mt-1"
+                  >
+                    <span>Open in Google Maps</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-emerald-600 shrink-0" />

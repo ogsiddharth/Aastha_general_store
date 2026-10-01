@@ -26,7 +26,7 @@ export default function CartPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-12">
+    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-24 md:pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -148,7 +148,7 @@ export default function CartPage() {
                   <span>Physical Store Pricing</span>
                 </div>
                 <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Exact item prices are verified at current daily retail rates upon WhatsApp order or physical store pickup at Station Road, Near Line Bazar, Jaunpur.
+                  Exact item prices are verified at current daily retail rates upon WhatsApp order or physical store pickup at Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002.
                 </p>
               </div>
 

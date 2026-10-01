@@ -100,14 +100,14 @@ export default function ShopPage() {
   );
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-8 animate-fade-in pb-24 md:pb-12">
       {/* Page Header */}
       <div className="space-y-2">
         <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
           Aastha Store Catalog
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-          Showing {filteredProducts.length} items of {products.length} total products • Jaunpur, Uttar Pradesh
+          Showing {filteredProducts.length} items of {products.length} total products • Station Road, Near Line Bazar, Jaunpur (222002)
         </p>
       </div>
 

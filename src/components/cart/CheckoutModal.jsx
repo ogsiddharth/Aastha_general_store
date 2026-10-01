@@ -121,20 +121,20 @@ export default function CheckoutModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg rounded-3xl glass-card border border-white/60 dark:border-white/10 shadow-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-slate-950/65 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg rounded-3xl glass-card border border-white/60 dark:border-white/10 shadow-2xl p-5 sm:p-8 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-200/80 dark:border-slate-800/80">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <MessageCircle className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+            <div className="min-w-0">
+              <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white truncate">
                 Place Your WhatsApp Order
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Aastha General Store • Jaunpur (+91 98073 29612)
+              <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                Station Road, Near Line Bazar, Jaunpur - 222002
               </p>
             </div>
           </div>

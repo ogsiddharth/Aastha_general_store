@@ -6,7 +6,10 @@
 
 export const STORE_PHONE = import.meta.env.VITE_STORE_PHONE || '919807329612';
 export const STORE_NAME = import.meta.env.VITE_STORE_NAME || 'Aastha General Store';
-export const STORE_LOCATION = import.meta.env.VITE_STORE_LOCATION || 'Jaunpur, Uttar Pradesh';
+export const STORE_LOCATION = import.meta.env.VITE_STORE_LOCATION || 'Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002';
+export const STORE_PINCODE = '222002';
+export const STORE_MAPS_URL = import.meta.env.VITE_STORE_MAPS_URL || 'https://share.google/OvRmvPo3AvTF542RG';
+export const STORE_MAPS_EMBED_URL = 'https://maps.google.com/maps?q=Station+Road,+Near+Line+Bazar,+Jaunpur,+Uttar+Pradesh+222002&t=&z=16&ie=UTF8&iwloc=&output=embed';
 
 /**
  * Format numeric value to Indian Rupee (₹) - Helper for Admin use
@@ -83,7 +86,8 @@ export function buildWhatsAppOrderMessage({ orderId, customerName, phone, addres
   }).join('\n\n');
 
   let message = `🛒 *NEW ORDER - AASTHA GENERAL STORE*\n` +
-    `📍 _Jaunpur, Uttar Pradesh_\n` +
+    `📍 _Station Road, Near Line Bazar, Jaunpur, UP - 222002_\n` +
+    `🗺️ *Store Map:* ${STORE_MAPS_URL}\n` +
     `${divider}\n` +
     `🆔 *Order ID:* \`${displayId}\`\n` +
     `👤 *Customer:* ${customerName}\n` +

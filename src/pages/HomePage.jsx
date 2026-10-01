@@ -15,10 +15,11 @@ import {
   Search,
   CheckCircle,
   Phone,
+  ExternalLink,
 } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 import { useAuth } from '../context/AuthContext';
-import { getTimeBasedGreeting } from '../utils/formatters';
+import { getTimeBasedGreeting, STORE_MAPS_URL, STORE_LOCATION, STORE_PINCODE, STORE_PHONE } from '../utils/formatters';
 import ProductCard from '../components/product/ProductCard';
 
 export default function HomePage() {
@@ -93,8 +94,8 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-300/50 dark:border-emerald-700/50 shadow-sm">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-            <span>Serving Jaunpur, Uttar Pradesh • Contact: +91 98073 29612</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
+            <span className="truncate">Station Road, Near Line Bazar, Jaunpur (222002) • +91 98073 29612</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15]">
@@ -330,35 +331,131 @@ export default function HomePage() {
         })}
       </section>
 
-      {/* Store Location & Community Trust Callout */}
-      <section className="glass-card p-6 sm:p-8 rounded-3xl border border-white/60 dark:border-white/10 bg-gradient-to-r from-emerald-50/50 to-amber-50/50 dark:from-slate-900/60 dark:to-emerald-950/20 shadow-glass">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
-              <Store className="w-4 h-4" />
-              <span>Local Jaunpur Retailer</span>
+      {/* Physical Store Location & Interactive Google Maps Section */}
+      <section id="store-location" className="space-y-6 pt-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-700/60 mb-2">
+              <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>PHYSICAL STORE LOCATION & VISITING HOURS</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-              Need bulk groceries or custom festive hampers?
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl">
-              Visit our store near Line Bazar / Olandganj, Jaunpur or call direct at +91 98073 29612. We prepare customized gift hampers, dry-fruit gift boxes, and monthly family ration packs.
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+              Visit Aastha General Store in Jaunpur
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Visit our physical store near Line Bazar for fresh groceries, personal care, cosmetics, and festival gift hampers.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
-            <a
-              href="tel:+919807329612"
-              className="px-5 py-3 rounded-2xl glass-card hover:bg-white dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-xs sm:text-sm shadow-sm transition-all"
-            >
-              📞 Call: +91 98073 29612
-            </a>
-            <Link
-              to="/shop"
-              className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/30 transition-all hover:scale-[1.02]"
-            >
-              Start Ordering Now
-            </Link>
+          <a
+            href={STORE_MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all self-start sm:self-auto shrink-0 touch-manipulation"
+          >
+            <span>Get Driving Directions</span>
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Store Details Card */}
+          <div className="lg:col-span-5 p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-6">
+            <div className="space-y-5">
+              {/* Exact Address */}
+              <div className="flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                    Store Address
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium mt-1 leading-relaxed">
+                    Station Road, Near Line Bazar, Jaunpur, Uttar Pradesh - 222002
+                  </p>
+                  <span className="inline-block mt-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md">
+                    PIN: 222002 • Landmark: Near Line Bazar
+                  </span>
+                </div>
+              </div>
+
+              {/* Visiting Hours */}
+              <div className="flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                    Store Timings
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium mt-1">
+                    Open Daily: 7:00 AM – 10:00 PM
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Monday to Sunday • 365 Days Open
+                  </p>
+                </div>
+              </div>
+
+              {/* Phone & WhatsApp Contact */}
+              <div className="flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white">
+                    Helpline & WhatsApp Inquiries
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium mt-1">
+                    +91 98073 29612
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Fast phone ordering and delivery confirmation
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2.5">
+              <a
+                href={STORE_MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-extrabold text-xs sm:text-sm shadow-sm hover:opacity-90 transition-all touch-manipulation"
+              >
+                <MapPin className="w-4 h-4 text-emerald-400 dark:text-emerald-600" />
+                <span>Open in Google Maps App</span>
+                <ExternalLink className="w-3.5 h-3.5 ml-1" />
+              </a>
+
+              <a
+                href="https://wa.me/919807329612?text=Namaste!%20I%20have%20an%20inquiry%20regarding%20Aastha%20General%20Store%2C%20Jaunpur."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-sm transition-all touch-manipulation"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Chat on WhatsApp (+91 98073 29612)</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Interactive Embedded Google Maps Iframe */}
+          <div className="lg:col-span-7 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm relative min-h-[360px] sm:min-h-[420px] bg-slate-100 dark:bg-slate-800">
+            <iframe
+              title="Aastha General Store Google Maps Location - Station Road, Near Line Bazar, Jaunpur"
+              src="https://maps.google.com/maps?q=Station+Road,+Near+Line+Bazar,+Jaunpur,+Uttar+Pradesh+222002&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full min-h-[360px] sm:min-h-[420px] border-0"
+              loading="lazy"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            <div className="absolute top-3 left-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md border border-slate-200/80 dark:border-slate-700 text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 pointer-events-none">
+              <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Station Road, Near Line Bazar, Jaunpur (222002)</span>
+            </div>
           </div>
         </div>
       </section>
